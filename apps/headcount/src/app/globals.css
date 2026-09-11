@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  min-height: 100%;
+  background: #f3f3f3;
+  color: #0d0d0d;
+}
+
+.font-sans,
+html,
+body {
+  font-family: var(--font-sans), sans-serif;
+}
+
+body {
+  font-feature-settings: "tnum" 1, "ss01" 1;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #0d0d0d;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

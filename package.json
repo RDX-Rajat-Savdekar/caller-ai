@@ -1,0 +1,24 @@
+{
+  "name": "caller-ai",
+  "private": true,
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @caller-ai/headcount dev",
+    "dev:headcount": "pnpm --filter @caller-ai/headcount dev",
+    "dev:vouch": "pnpm --filter @caller-ai/vouch dev",
+    "dev:sim": "pnpm --filter @caller-ai/sim dev",
+    "dev:stack": "pnpm --filter @caller-ai/sim --filter @caller-ai/headcount --parallel dev",
+    "db:seed": "pnpm --filter @caller-ai/headcount db:seed && pnpm --filter @caller-ai/vouch db:seed",
+    "db:seed:headcount": "pnpm --filter @caller-ai/headcount db:seed",
+    "db:seed:vouch": "pnpm --filter @caller-ai/vouch db:seed",
+    "test": "pnpm --filter @caller-ai/core test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "smoke": "pnpm --filter @caller-ai/core smoke"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["better-sqlite3", "esbuild"]
+  }
+}

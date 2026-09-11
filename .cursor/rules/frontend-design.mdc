@@ -1,0 +1,9 @@
+---
+description: Light Uber-style dashboard. Follow the frontend-design skill.
+globs: apps/**/*.{tsx,css}
+alwaysApply: false
+---
+
+Read `.cursor/skills/frontend-design/SKILL.md` and `.cursor/skills/frontend-design/console.md`.
+
+White canvas, padded cards, pill buttons. Plus Jakarta Sans. Do not revert to a dark ops board or Inter.
