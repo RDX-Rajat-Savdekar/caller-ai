@@ -7,6 +7,9 @@ Compiled Sep 10, 2026 from `CALLE-AI/call-e-integrations`, `CALLE-AI/awesome-pho
 `docs.heycall-e.com`, and the published SDKs. Versions move fast — the Python SDK went 0.1 → 0.7
 in ten weeks and 0.7 added a feature the main README doesn't document yet.
 
+**Living schedule and remaining work:** [`build-plan.md`](./build-plan.md) §9. This file stays
+the platform / competitive scan. Do not treat the four-day table in §8 as current.
+
 ---
 
 ## 1. What CALL-E actually is
@@ -424,15 +427,18 @@ user.
 
 ### Four-day plan
 
-| Day | Work |
-| --- | --- |
-| **Today (Sep 10)** | Install + auth + **one real test call to your own phone**. Request extra calls via the form — do this first, approval takes time. Lock the idea. |
-| **Sep 11** | Core loop end to end in fixture mode. Nail `result_schema` and `recipient_result_schema`. Zero real calls. |
-| **Sep 12** | Verification layer, fail-closed dispositions, README, safety doc, tests. Spend ~3 real calls on validation. |
-| **Sep 13** | Record the video (budget ~5 real calls for takes). Open the PR early — leave room for review comments. Submit the feedback survey. |
-| **Sep 14, pre-8:45am PDT** | Buffer only. Do not plan to build on the deadline day. |
+Superseded by [`build-plan.md`](./build-plan.md) §9. Snapshot of the original Sep 10 sketch:
 
-Call budget across all of that: roughly 10 of your 20, leaving headroom for things going wrong.
+| Day | Original ask | As of Sat Sep 12 |
+| --- | --- | --- |
+| **Sep 10** | Install + auth + one real test call. Extra-calls form. Lock the idea. | Monorepo + plan locked (`headcount` + `vouch`). |
+| **Sep 11** | Core loop in fixture mode. Zero real calls. | `packages/core`, `packages/sim`, headcount wave runner. |
+| **Sep 12** | Verification, fail-closed, README, safety, ~3 live calls. | Both consoles + reels shipped. Live batch and judge READMEs still open. |
+| **Sep 13** | Video, open PRs, feedback survey. | **This is the remaining day.** Packaging + video + two PRs. No new product. |
+| **Sep 14, pre-8:45am PDT** | Buffer only. | Still buffer only. |
+
+Call budget: stay inside 20. Fixture mode is the default. One real call in the video is the
+scored criterion.
 
 ---
 

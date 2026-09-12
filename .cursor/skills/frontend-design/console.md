@@ -39,4 +39,7 @@ pale canvas
   [ Critical ] [ Follow-up ] [ Safe ] [ Unaccounted ]
 ```
 
+`vouch` uses the same shell: Confirmed / Third-party / Pending / Blocked, then Verification reel
+and Scope reel (requested vs permitted + transcript).
+
 Do not go back to dark WebEOC, hairline duty boards, or Inter.

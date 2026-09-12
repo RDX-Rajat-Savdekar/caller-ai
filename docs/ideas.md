@@ -1,5 +1,8 @@
 # CALL-E — idea long list
 
+Locked pair is in [`build-plan.md`](./build-plan.md): `headcount` + `vouch`. Do not pick a third
+idea from this list unless both PRs are already open.
+
 Companion to [`calle-platform.md`](./calle-platform.md). That doc's §7 has six ranked ideas
 (prior-auth chaser, IVR cartographer, uncovered plugin, `calle-call-chat`, schema linter,
 document-requirement resolver). **Nothing here repeats those.** This is the wider list, written
