@@ -1,30 +1,39 @@
-import { readFileSync, readdirSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import cooperative from "../fixtures/cooperative.json" with { type: "json" };
+import emergency from "../fixtures/emergency.json" with { type: "json" };
+import gatekeeper from "../fixtures/gatekeeper.json" with { type: "json" };
+import hostile from "../fixtures/hostile.json" with { type: "json" };
+import ivrMaze from "../fixtures/ivr_maze.json" with { type: "json" };
+import partial from "../fixtures/partial.json" with { type: "json" };
+import unsupportedClaim from "../fixtures/unsupported_claim.json" with { type: "json" };
+import voicemail from "../fixtures/voicemail.json" with { type: "json" };
+import wrongPerson from "../fixtures/wrong_person.json" with { type: "json" };
 import type { PersonaFixture, PersonaId } from "./types";
 
-const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), "../fixtures");
-
-const cache = new Map<PersonaId, PersonaFixture>();
+const FIXTURES: Record<PersonaId, PersonaFixture> = {
+  cooperative: cooperative as PersonaFixture,
+  voicemail: voicemail as PersonaFixture,
+  partial: partial as PersonaFixture,
+  emergency: emergency as PersonaFixture,
+  wrong_person: wrongPerson as PersonaFixture,
+  gatekeeper: gatekeeper as PersonaFixture,
+  ivr_maze: ivrMaze as PersonaFixture,
+  hostile: hostile as PersonaFixture,
+  unsupported_claim: unsupportedClaim as PersonaFixture,
+};
 
 export function loadFixture(id: PersonaId): PersonaFixture {
-  const cached = cache.get(id);
-  if (cached) return cached;
-  const raw = readFileSync(join(fixturesDir, `${id}.json`), "utf8");
-  const fixture = JSON.parse(raw) as PersonaFixture;
-  cache.set(id, fixture);
-  return fixture;
+  return FIXTURES[id];
 }
 
 export function listPersonaIds(): PersonaId[] {
-  return readdirSync(fixturesDir)
-    .filter((name) => name.endsWith(".json"))
-    .map((name) => name.replace(/\.json$/, "") as PersonaId);
+  return Object.keys(FIXTURES) as PersonaId[];
 }
 
 export function pickPersona(request: Record<string, unknown>): PersonaId {
   const metadata = (request.metadata ?? {}) as Record<string, unknown>;
-  if (typeof metadata.persona === "string") return metadata.persona as PersonaId;
+  if (typeof metadata.persona === "string" && metadata.persona in FIXTURES) {
+    return metadata.persona as PersonaId;
+  }
   const recipients = (request.recipients ?? []) as Array<{ phones?: string[] }>;
   const phone = recipients[0]?.phones?.[0] ?? "";
   if (phone.endsWith("01")) return "cooperative";

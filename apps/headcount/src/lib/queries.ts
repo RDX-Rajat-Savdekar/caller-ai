@@ -1,7 +1,14 @@
 import { eq } from "drizzle-orm";
-import { isReached, type Disposition } from "@caller-ai/core";
+import {
+  DEFAULT_PROJECT_CAP,
+  isReached,
+  remainingCalls,
+  resolveCalleMode,
+  type Disposition,
+} from "@caller-ai/core";
 import { db, schema } from "@/db";
 import { parseJson } from "./utils";
+import { countAttempts, getKilled } from "./wave-runner";
 
 export const SEED_EVENT_ID = "evt_bennett_valley";
 
@@ -33,6 +40,24 @@ export async function getAttempt(id: string) {
   return db.select().from(schema.attempts).where(eq(schema.attempts.id, id)).get();
 }
 
+export async function getWave(id: string) {
+  return db.select().from(schema.waves).where(eq(schema.waves.id, id)).get();
+}
+
+export async function getConsoleState() {
+  const used = countAttempts();
+  const killed = getKilled();
+  const cap = DEFAULT_PROJECT_CAP;
+  const remaining = remainingCalls({ projectCap: cap, used, killed, blocklist: [] });
+  return {
+    used,
+    cap,
+    remaining,
+    killed,
+    mode: resolveCalleMode(),
+  };
+}
+
 export async function getRosterEntry(id: string) {
   return db.select().from(schema.roster).where(eq(schema.roster.id, id)).get();
 }
@@ -54,7 +79,13 @@ export async function triageForEvent(eventId: string) {
   const cards = db.select().from(schema.triageCards).where(eq(schema.triageCards.eventId, eventId)).all();
   const people = await listRoster(eventId);
   const byId = new Map(people.map((row) => [row.id, row]));
-  return cards.map((card) => ({
+  const latest = new Map<string, (typeof cards)[number]>();
+  for (const card of cards) {
+    const current = latest.get(card.rosterEntryId);
+    if (!current || card.id > current.id) latest.set(card.rosterEntryId, card);
+  }
+
+  return [...latest.values()].map((card) => ({
     ...card,
     needs: parseJson<string[]>(card.needsJson, []),
     household: byId.get(card.rosterEntryId),

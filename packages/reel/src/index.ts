@@ -1,25 +1,6 @@
-/**
- * Remotion compositions land Saturday. Input is a real call's JSON.
- * CallReel + CoverageReel are required; ScopeReel is nice-to-have.
- * Source: docs/build-plan.md §4.
- */
-
-export type CallReelProps = {
-  transcript_turns: Array<{ offset_seconds?: number; speaker: string; text: string }>;
-  structured_result: Record<string, unknown>;
-  linked: Array<{ field: string; value: unknown; supported: boolean; score: number }>;
-};
-
-export type CoverageReelProps = {
-  dialed: number;
-  reached: number;
-  unaccounted: number;
-};
-
-export type ScopeReelProps = {
-  requested: string[];
-  permitted: string[];
-  blocked: string[];
-};
-
-export const REEL_COMPOSITIONS = ["CallReel", "CoverageReel", "TitleCards"] as const;
+export { CallReel, CALL_REEL_DURATION_FALLBACK, CALL_REEL_FPS, CALL_REEL_HEIGHT, CALL_REEL_WIDTH, callReelFrames } from "./CallReel";
+export { CoverageReel, COVERAGE_REEL_DURATION, COVERAGE_REEL_FPS, COVERAGE_REEL_HEIGHT, COVERAGE_REEL_WIDTH } from "./CoverageReel";
+export { TitleCards, TITLE_CARDS_DURATION, TITLE_CARDS_FPS, TITLE_CARDS_HEIGHT, TITLE_CARDS_WIDTH } from "./TitleCards";
+export { RemotionRoot } from "./Root";
+export { REEL_COMPOSITIONS } from "./compositions";
+export type { CallReelProps, CoverageReelProps, ScopeReelProps, TitleCardsProps } from "./types";

@@ -20,7 +20,7 @@ body {
 }
 
 body {
-  font-feature-settings: "tnum" 1, "ss01" 1;
+  font-feature-settings: "tnum" 1;
 }
 
 .tabular {

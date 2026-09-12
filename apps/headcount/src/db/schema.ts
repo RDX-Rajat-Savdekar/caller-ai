@@ -50,7 +50,14 @@ export const attempts = sqliteTable("attempts", {
   disposition: text("disposition"),
   resultJson: text("result_json"),
   transcriptJson: text("transcript_json"),
+  evidenceJson: text("evidence_json"),
+  confidenceScore: text("confidence_score"),
   status: text("status").notNull(),
+});
+
+export const settings = sqliteTable("settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
 });
 
 export const triageCards = sqliteTable("triage_cards", {

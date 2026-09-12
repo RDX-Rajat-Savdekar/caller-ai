@@ -1,5 +1,17 @@
 import type Database from "better-sqlite3";
 
+function addColumnIfMissing(
+  sqlite: Database.Database,
+  table: string,
+  column: string,
+  ddl: string,
+) {
+  const cols = sqlite.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+  if (!cols.some((col) => col.name === column)) {
+    sqlite.exec(`ALTER TABLE ${table} ADD COLUMN ${ddl}`);
+  }
+}
+
 export function ensureSchema(sqlite: Database.Database) {
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS events (
@@ -48,6 +60,8 @@ export function ensureSchema(sqlite: Database.Database) {
       disposition TEXT,
       result_json TEXT,
       transcript_json TEXT,
+      evidence_json TEXT,
+      confidence_score TEXT,
       status TEXT NOT NULL
     );
     CREATE TABLE IF NOT EXISTS triage_cards (
@@ -60,5 +74,13 @@ export function ensureSchema(sqlite: Database.Database) {
       assignee TEXT,
       status TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
+    INSERT OR IGNORE INTO settings (key, value) VALUES ('killed', '0');
   `);
+
+  addColumnIfMissing(sqlite, "attempts", "evidence_json", "evidence_json TEXT");
+  addColumnIfMissing(sqlite, "attempts", "confidence_score", "confidence_score TEXT");
 }

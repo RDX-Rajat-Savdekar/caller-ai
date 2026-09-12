@@ -11,12 +11,16 @@
   },
   "dependencies": {
     "@caller-ai/core": "workspace:*",
+    "@caller-ai/reel": "workspace:*",
+    "@caller-ai/sim": "workspace:*",
+    "@remotion/player": "^4.0.355",
     "better-sqlite3": "^12.4.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.44.5",
     "next": "^15.5.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "remotion": "^4.0.355",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {

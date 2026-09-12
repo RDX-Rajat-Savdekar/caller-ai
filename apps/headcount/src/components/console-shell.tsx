@@ -1,9 +1,12 @@
 import Link from "next/link";
+import { toggleKill } from "@/app/actions";
+import { getConsoleState } from "@/lib/queries";
 
 type ConsoleShellProps = {
   eventId?: string;
   eventName?: string;
   active?: "coverage" | "roster" | "wave" | "instrument" | "call";
+  tight?: boolean;
   children: React.ReactNode;
 };
 
@@ -13,8 +16,10 @@ function navClass(on: boolean) {
     : "rounded-full px-3.5 py-1.5 text-sm text-mute hover:bg-white";
 }
 
-export function ConsoleShell({ eventId, eventName, active, children }: ConsoleShellProps) {
+export async function ConsoleShell({ eventId, eventName, active, tight, children }: ConsoleShellProps) {
   const home = eventId ? `/events/${eventId}` : "/";
+  const budget = await getConsoleState();
+  const fill = budget.cap === 0 ? 0 : (budget.remaining / budget.cap) * 100;
 
   return (
     <div className="min-h-screen bg-canvas text-ink">
@@ -42,22 +47,33 @@ export function ConsoleShell({ eventId, eventName, active, children }: ConsoleSh
           ) : null}
           <div className="ml-auto flex items-center gap-4">
             <div className="text-right">
-              <p className="tabular text-sm font-semibold">20 left</p>
-              <p className="text-xs text-mute">of 20 · fixture</p>
+              <p className="tabular text-sm font-semibold">{budget.remaining} left</p>
+              <p className="text-xs text-mute">
+                of {budget.cap} · {budget.mode === "live" ? "live" : "fixture"}
+                {budget.killed ? " · killed" : ""}
+              </p>
             </div>
             <div className="h-1.5 w-16 overflow-hidden rounded-full bg-line">
-              <div className="h-full w-full rounded-full bg-ink" />
+              <div className="h-full rounded-full bg-ink" style={{ width: `${fill}%` }} />
             </div>
-            <button
-              type="button"
-              className="rounded-full border border-critical px-4 py-1.5 text-sm font-medium text-critical"
-            >
-              Kill switch
-            </button>
+            <form action={toggleKill}>
+              <button
+                type="submit"
+                className={
+                  budget.killed
+                    ? "rounded-full bg-critical px-4 py-1.5 text-sm font-medium text-white"
+                    : "rounded-full border border-critical px-4 py-1.5 text-sm font-medium text-critical"
+                }
+              >
+                {budget.killed ? "Killed" : "Kill switch"}
+              </button>
+            </form>
           </div>
         </div>
       </header>
-      <div className="mx-auto max-w-[1200px] space-y-6 px-8 py-8">{children}</div>
+      <div className={`mx-auto max-w-[1200px] px-8 ${tight ? "space-y-4 py-5" : "space-y-6 py-8"}`}>
+        {children}
+      </div>
     </div>
   );
 }

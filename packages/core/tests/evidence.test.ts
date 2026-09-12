@@ -2,6 +2,14 @@ import { describe, expect, it } from "vitest";
 import { linkEvidence } from "../src/evidence";
 
 describe("evidence linker", () => {
+  it("does not treat an honest unknown as an unsupported claim", () => {
+    const linked = linkEvidence({
+      structuredResult: { has_power: "unknown" },
+      turns: [{ speaker: "user", text: "We already left." }],
+    });
+    expect(linked[0]?.supported).toBe(true);
+  });
+
   it("marks a field unsupported when the transcript never said it", () => {
     const linked = linkEvidence({
       structuredResult: { has_power: "yes" },
@@ -9,6 +17,25 @@ describe("evidence linker", () => {
       turns: [{ speaker: "user", text: "We still have running water." }],
     });
     expect(linked[0]?.supported).toBe(false);
+  });
+
+  it("supports cooperative answers without dumping every evidence sentence into the claim", () => {
+    const linked = linkEvidence({
+      structuredResult: {
+        safety_status: "safe",
+        has_power: "yes",
+        has_water: "yes",
+      },
+      evidence: [
+        "The recipient said everyone in the household is safe.",
+        "They have electricity and running water.",
+      ],
+      turns: [
+        { speaker: "user", text: "Yes, everyone is safe. We're all here." },
+        { speaker: "user", text: "We have electricity and running water." },
+      ],
+    });
+    expect(linked.every((field) => field.supported)).toBe(true);
   });
 
   it("links a field to the supporting user turn", () => {

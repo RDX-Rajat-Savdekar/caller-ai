@@ -7,9 +7,22 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "studio": "remotion studio src/entry.tsx",
+    "render:call": "remotion render src/entry.tsx CallReel out/call-reel.mp4",
+    "render:coverage": "remotion render src/entry.tsx CoverageReel out/coverage-reel.mp4",
+    "render:titles": "remotion render src/entry.tsx TitleCards out/title-cards.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.355",
+    "@remotion/google-fonts": "^4.0.355",
+    "@remotion/player": "^4.0.355",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "remotion": "^4.0.355"
   },
   "devDependencies": {
+    "@types/react": "^19.1.12",
     "typescript": "^5.9.2"
   }
 }
