@@ -19,7 +19,7 @@ function navClass(on: boolean) {
 export async function ConsoleShell({ eventId, eventName, active, tight, children }: ConsoleShellProps) {
   const home = eventId ? `/events/${eventId}` : "/";
   const budget = await getConsoleState();
-  const fill = budget.cap === 0 ? 0 : (budget.remaining / budget.cap) * 100;
+  const meter = budget.cap === 0 ? 0 : (budget.remaining / budget.cap) * 100;
 
   return (
     <div className="min-h-screen bg-canvas text-ink">
@@ -54,7 +54,7 @@ export async function ConsoleShell({ eventId, eventName, active, tight, children
               </p>
             </div>
             <div className="h-1.5 w-16 overflow-hidden rounded-full bg-line">
-              <div className="h-full rounded-full bg-ink" style={{ width: `${fill}%` }} />
+              <div className="h-full rounded-full bg-ink" style={{ width: `${meter}%` }} />
             </div>
             <form action={toggleKill}>
               <button
@@ -71,7 +71,7 @@ export async function ConsoleShell({ eventId, eventName, active, tight, children
           </div>
         </div>
       </header>
-      <div className={`mx-auto max-w-[1200px] px-8 ${tight ? "space-y-4 py-5" : "space-y-6 py-8"}`}>
+      <div className={`mx-auto w-full max-w-[1200px] px-8 ${tight ? "space-y-4 py-5" : "space-y-6 py-8"}`}>
         {children}
       </div>
     </div>

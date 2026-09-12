@@ -13,6 +13,7 @@ import { ensureSchema } from "./ensure";
 const eventId = "evt_bennett_valley";
 const instrumentId = "ins_casper_v1";
 const waveId = "wav_1";
+const afterAction = process.env.SEED_MODE === "after";
 
 const roster = [
   { id: "rst_01", name: "Household 01", phone: "+15555550101", masked: "+1 555 ••• ••01", hh: 3 },
@@ -76,6 +77,22 @@ sqlite
     "Is there anything urgent you need help with right now?",
   ]), taskText);
 
+const insertRoster = sqlite.prepare(
+  `INSERT INTO roster (id, event_id, display_name, phone_masked, phone_e164, region, locale, timezone, household_size, flags_json)
+   VALUES (?, ?, ?, ?, ?, 'US', 'en-US', 'America/Los_Angeles', ?, ?)`,
+);
+
+for (const row of roster) {
+  insertRoster.run(row.id, eventId, row.name, row.masked, row.phone, row.hh, "[]");
+}
+
+if (!afterAction) {
+  console.log(`[seed] empty drill — ${roster.length} roster rows at ${dbFile}`);
+  console.log("[seed] confirm wave 1 to start. After-action screenshots: pnpm db:seed:after");
+  sqlite.close();
+  process.exit(0);
+}
+
 sqlite
   .prepare(
     `INSERT INTO waves (id, event_id, instrument_id, wave_no, filter_json, budget_cap, status)
@@ -83,21 +100,17 @@ sqlite
   )
   .run(waveId, eventId, instrumentId, JSON.stringify({ slice: "full_roster" }));
 
-const insertRoster = sqlite.prepare(
-  `INSERT INTO roster (id, event_id, display_name, phone_masked, phone_e164, region, locale, timezone, household_size, flags_json)
-   VALUES (?, ?, ?, ?, ?, 'US', 'en-US', 'America/Los_Angeles', ?, ?)`,
-);
 const insertAttempt = sqlite.prepare(
-  `INSERT INTO attempts (id, wave_id, roster_entry_id, run_id, idempotency_key, disposition, result_json, transcript_json, evidence_json, confidence_score, status)
-   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'terminal')`,
+  `INSERT INTO attempts (id, wave_id, roster_entry_id, run_id, idempotency_key, disposition, result_json, transcript_json, evidence_json, confidence_score, status, started_at)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'terminal', ?)`,
 );
 const insertTriage = sqlite.prepare(
   `INSERT INTO triage_cards (id, event_id, attempt_id, roster_entry_id, severity, needs_json, assignee, status)
    VALUES (?, ?, ?, ?, ?, ?, NULL, ?)`,
 );
 
+const now = Date.now();
 for (const row of roster) {
-  insertRoster.run(row.id, eventId, row.name, row.masked, row.phone, row.hh, "[]");
   const script = loadCallScript(ROSTER_SCRIPTS[row.id] ?? "cooperative");
   const linked = linkEvidence({
     structuredResult: script.result,
@@ -122,6 +135,7 @@ for (const row of roster) {
     JSON.stringify(script.turns),
     JSON.stringify(script.evidence),
     String(script.confidence),
+    now,
   );
   insertTriage.run(
     `tri_${row.id}_w1`,
@@ -136,5 +150,6 @@ for (const row of roster) {
 
 const unaccounted = sqlite.prepare(`SELECT COUNT(*) AS n FROM triage_cards WHERE severity = 'unaccounted'`).get() as { n: number };
 const critical = sqlite.prepare(`SELECT COUNT(*) AS n FROM triage_cards WHERE severity = 'critical'`).get() as { n: number };
-console.log(`[seed] wrote ${roster.length} roster rows to ${dbFile}`);
-console.log(`[seed] transcripts attached; triage ${critical.n} critical / ${unaccounted.n} unaccounted`);
+console.log(`[seed] after-action — ${roster.length} completed calls at ${dbFile}`);
+console.log(`[seed] triage ${critical.n} critical / ${unaccounted.n} unaccounted`);
+sqlite.close();

@@ -53,6 +53,7 @@ export const attempts = sqliteTable("attempts", {
   evidenceJson: text("evidence_json"),
   confidenceScore: text("confidence_score"),
   status: text("status").notNull(),
+  startedAt: integer("started_at"),
 });
 
 export const settings = sqliteTable("settings", {

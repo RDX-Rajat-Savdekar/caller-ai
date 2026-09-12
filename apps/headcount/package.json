@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start --port 3000",
     "typecheck": "tsc --noEmit",
-    "db:seed": "node --import tsx src/db/seed.ts"
+    "db:seed": "node --import tsx src/db/seed.ts",
+    "db:seed:after": "SEED_MODE=after node --import tsx src/db/seed.ts"
   },
   "dependencies": {
     "@caller-ai/core": "workspace:*",

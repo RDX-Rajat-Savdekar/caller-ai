@@ -10,7 +10,7 @@ export default async function NewWavePage({ params }: { params: Promise<{ id: st
   if (!event) notFound();
   const [instrument] = await listInstruments(id);
   const preview = previewNextWave(id);
-  const blocked = preview.killed || preview.alreadyRan || preview.wouldDial === 0;
+  const blocked = preview.killed || preview.alreadyRan || preview.running || preview.wouldDial === 0;
 
   return (
     <ConsoleShell eventId={event.id} eventName={event.name} active="wave">
@@ -21,13 +21,18 @@ export default async function NewWavePage({ params }: { params: Promise<{ id: st
           {preview.wouldRemain} remain
         </p>
         {preview.killed ? <p className="mt-3 text-sm text-critical">Kill switch is on. No new dials.</p> : null}
+        {preview.running ? <p className="mt-3 text-sm text-mute">A wave is still running. Watch coverage.</p> : null}
         {preview.alreadyRan ? <p className="mt-3 text-sm text-mute">This wave already ran. Re-run is a no-op.</p> : null}
       </div>
 
       <div className="rounded-2xl bg-white p-6 shadow-card">
         <p className="mb-3 text-sm text-mute">Who this wave dials</p>
         {preview.targets.length === 0 ? (
-          <p className="text-sm text-mute">No retryable or needs-assistance households left.</p>
+          <p className="text-sm text-mute">
+            {preview.running
+              ? "Households in this wave are already on the line."
+              : "No retryable or needs-assistance households left."}
+          </p>
         ) : (
           <ul className="space-y-2">
             {preview.targets.map((target) => (

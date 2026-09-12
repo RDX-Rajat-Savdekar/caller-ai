@@ -83,4 +83,5 @@ export function ensureSchema(sqlite: Database.Database) {
 
   addColumnIfMissing(sqlite, "attempts", "evidence_json", "evidence_json TEXT");
   addColumnIfMissing(sqlite, "attempts", "confidence_score", "confidence_score TEXT");
+  addColumnIfMissing(sqlite, "attempts", "started_at", "started_at INTEGER");
 }

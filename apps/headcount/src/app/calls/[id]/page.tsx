@@ -24,6 +24,7 @@ export default async function CallPage({ params }: { params: Promise<{ id: strin
   const wave = await getWave(attempt.waveId);
   const event = wave ? await getEvent(wave.eventId) : null;
   const instrument = wave ? await getInstrument(wave.instrumentId) : null;
+  const inFlight = attempt.status === "in_progress";
   const result = parseJson<Record<string, unknown>>(attempt.resultJson, {});
   const turns = parseJson<TranscriptTurn[]>(attempt.transcriptJson, []);
   const evidence = parseJson<string[]>(attempt.evidenceJson, []);
@@ -36,138 +37,133 @@ export default async function CallPage({ params }: { params: Promise<{ id: strin
     linked,
     confidence,
   });
+  const reelProps = {
+    household: household?.displayName ?? attempt.rosterEntryId,
+    disposition: attempt.disposition ?? "pending",
+    transcript_turns: turns,
+    linked: linked.map((field) => ({
+      field: field.field,
+      value: field.value,
+      supported: field.supported,
+      score: field.score,
+      turnText: field.turn?.text ?? null,
+      turnOffset: field.turn?.offset_seconds ?? null,
+    })),
+  };
 
   return (
     <ConsoleShell eventId={event?.id} eventName={event?.name} active="call" tight>
-      <div className="flex items-end justify-between gap-4 rounded-2xl bg-white px-5 py-4 shadow-card">
-        <div>
-          <Link href={event ? `/events/${event.id}` : "/"} className="text-xs text-mute hover:text-ink">
-            Coverage
-          </Link>
-          <h1 className="mt-1 text-xl font-semibold">{household?.displayName ?? attempt.rosterEntryId}</h1>
-          <p className="mt-0.5 text-xs text-mute">{household?.phoneMasked}</p>
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white px-5 py-3 shadow-card">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-xs text-mute">
+            <Link href={event ? `/events/${event.id}` : "/"} className="hover:text-ink">
+              Coverage
+            </Link>
+            <span>·</span>
+            <span>{wave ? `Wave ${wave.waveNo}` : "—"}</span>
+            <span>·</span>
+            <span>{household?.region} {household?.locale} {household?.timezone}</span>
+          </div>
+          <h1 className="mt-0.5 truncate text-lg font-semibold">
+            {household?.displayName ?? attempt.rosterEntryId}
+            <span className="ml-2 text-sm font-normal text-mute">{household?.phoneMasked}</span>
+          </h1>
         </div>
-        <p className={`text-sm font-medium ${reached ? "text-safe" : "text-unaccounted"}`}>
-          {prettyValue(attempt.disposition ?? "pending")}
+        <p className={`text-sm font-medium ${inFlight ? "text-ink" : reached ? "text-safe" : "text-unaccounted"}`}>
+          {prettyValue(attempt.disposition ?? (inFlight ? "on_the_line" : "pending"))}
         </p>
       </div>
 
-      <section className="grid gap-3 md:grid-cols-2">
-        <article className="rounded-2xl bg-white px-5 py-4 shadow-card">
-          <h2 className="text-sm font-semibold">Why this call?</h2>
-          <dl className="mt-3 space-y-1.5 text-xs">
-            <Row label="Authorization" value={`${event?.agency ?? "—"} · opt-in roster`} />
-            <Row label="Event" value={event?.name ?? "—"} />
-            <Row label="Instrument" value={instrument ? `${instrument.title} · v${instrument.version}` : "—"} />
-            <Row label="Wave" value={wave ? `Wave ${wave.waveNo}` : "—"} />
-            <Row
-              label="Recipient"
-              value={
-                household
-                  ? `${household.region} · ${household.locale} · ${household.timezone}`
-                  : "region set on the roster, not inferred"
-              }
-            />
-            <Row label="Callback" value={event?.callbackNumber ?? "—"} />
-          </dl>
-        </article>
-
-        {triage.dispatch ? (
-          <article className="rounded-2xl bg-white px-5 py-4 shadow-card">
-            <p className="text-xs font-medium text-critical">Dispatch</p>
-            <h2 className="mt-1 text-sm font-semibold">Flagged for a human. Not resolved.</h2>
-            <p className="mt-2 text-xs text-mute">
-              Ambiguity and unsupported claims stay with a person. This card cannot be auto-closed.
-            </p>
-            {triage.needs.length > 0 ? (
-              <ul className="mt-3 flex flex-wrap gap-1.5">
-                {triage.needs.map((need) => (
-                  <li key={need} className="rounded-full bg-canvas px-2.5 py-0.5 text-xs text-mute">
-                    {need.replaceAll("_", " ")}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </article>
-        ) : (
-          <article className="rounded-2xl bg-white px-5 py-4 shadow-card">
-            <p className="text-xs text-mute">{triage.severity === "safe" ? "Assessment" : "Status"}</p>
-            <h2 className="mt-1 text-sm font-semibold">
-              {triage.severity === "safe"
-                ? "No dispatch. Household is accounted for."
-                : "Still unaccounted. Not a completed assessment."}
-            </h2>
-            <p className="mt-2 text-xs text-mute">
-              {reached
-                ? "Reached a person. Fields below are scored against the transcript."
-                : "Voicemail and no-answer stay in the unreached count."}
-            </p>
-          </article>
-        )}
-      </section>
-
-      <CallReelPlayer
-        compact
-        household={household?.displayName ?? attempt.rosterEntryId}
-        disposition={attempt.disposition ?? "pending"}
-        transcript_turns={turns}
-        linked={linked.map((field) => ({
-          field: field.field,
-          value: field.value,
-          supported: field.supported,
-          score: field.score,
-          turnText: field.turn?.text ?? null,
-          turnOffset: field.turn?.offset_seconds ?? null,
-        }))}
-      />
-
-      <section className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        {linked.map((field) => (
-          <article key={field.field} className="rounded-2xl bg-white px-4 py-3.5 shadow-card">
-            <p className="text-xs text-mute">{fieldLabel(field.field)}</p>
-            <p
-              className={`mt-1 text-base font-semibold ${
-                field.supported ? "text-ink" : "text-critical line-through"
-              }`}
-            >
-              {prettyValue(field.value)}
-            </p>
-            {field.supported && field.turn ? (
-              <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-mute">“{field.turn.text}”</p>
-            ) : (
-              <p className="mt-1.5 text-xs text-critical">Not on the transcript — send to dispatch</p>
-            )}
-          </article>
-        ))}
-      </section>
-
-      <section className="rounded-2xl bg-white px-5 py-4 shadow-card">
-        <h2 className="text-sm font-semibold">Transcript</h2>
-        <ol className="mt-3 space-y-2">
-          {turns.map((turn, index) => (
-            <li
-              key={`${turn.offset_seconds}-${index}`}
-              className={`max-w-[72%] rounded-xl px-3 py-2 ${
-                turn.speaker === "user" ? "ml-auto bg-canvas" : "bg-[#f7f7f7]"
-              }`}
-            >
-              <p className="text-[11px] text-mute">
-                {turn.speaker === "user" ? "Household" : "Assistant"} · {formatClock(turn.offset_seconds)}
-              </p>
-              <p className="mt-0.5 text-sm leading-5">{turn.text}</p>
-            </li>
+      {inFlight ? (
+        <p className="text-sm text-mute">This call is still in progress. Coverage will land the card when it ends.</p>
+      ) : triage.dispatch ? (
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-white px-5 py-2.5 shadow-card">
+          <p className="text-sm font-medium text-critical">Dispatch · not resolved</p>
+          {triage.needs.map((need) => (
+            <span key={need} className="rounded-full bg-canvas px-2.5 py-0.5 text-xs text-mute">
+              {need.replaceAll("_", " ")}
+            </span>
           ))}
-        </ol>
-      </section>
-    </ConsoleShell>
-  );
-}
+        </div>
+      ) : (
+        <p className="text-xs text-mute">
+          {triage.severity === "safe"
+            ? "No dispatch. Household is accounted for."
+            : "Still unaccounted. Not a completed assessment."}
+        </p>
+      )}
 
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between gap-4">
-      <dt className="shrink-0 text-mute">{label}</dt>
-      <dd className="truncate text-right">{value}</dd>
-    </div>
+      <div className="grid grid-cols-2 gap-3">
+        <section className="overflow-hidden rounded-2xl bg-white shadow-card">
+          <div className="shrink-0 border-b border-line px-5 py-2.5 text-sm font-semibold">Fields</div>
+          <div>
+            <table className="w-full text-left text-sm">
+              <thead className="sticky top-0 bg-white text-xs text-mute">
+                <tr>
+                  <th className="px-5 py-2 font-medium">Field</th>
+                  <th className="px-5 py-2 font-medium">Value</th>
+                  <th className="px-5 py-2 font-medium">On the transcript</th>
+                </tr>
+              </thead>
+              <tbody>
+                {linked.map((field) => (
+                  <tr key={field.field} className="border-t border-line">
+                    <td className="px-5 py-2.5 text-mute">{fieldLabel(field.field)}</td>
+                    <td
+                      className={`px-5 py-2.5 font-semibold ${
+                        field.supported ? "text-ink" : "text-critical line-through"
+                      }`}
+                    >
+                      {prettyValue(field.value)}
+                    </td>
+                    <td className={`px-5 py-2.5 text-xs ${field.supported ? "text-mute" : "text-critical"}`}>
+                      {field.supported && field.turn
+                        ? `“${field.turn.text}”`
+                        : "Not on the transcript — send to dispatch"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="overflow-hidden rounded-2xl bg-white shadow-card">
+          <div className="border-b border-line px-5 py-2.5 text-sm font-semibold">Transcript</div>
+          <ol className="space-y-2 px-4 py-3">
+            {turns.map((turn, index) => (
+              <li
+                key={`${turn.offset_seconds}-${index}`}
+                className={`max-w-[85%] rounded-xl px-3 py-2 ${
+                  turn.speaker === "user" ? "ml-auto bg-canvas" : "bg-[#f7f7f7]"
+                }`}
+              >
+                <p className="text-[11px] text-mute">
+                  {turn.speaker === "user" ? "Household" : "Assistant"} · {formatClock(turn.offset_seconds)}
+                </p>
+                <p className="mt-0.5 text-sm leading-5">{turn.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </div>
+
+      <details className="rounded-2xl bg-white px-5 py-2 shadow-card">
+        <summary className="cursor-pointer text-sm text-mute">
+          Why this call? · {event?.agency} · {instrument?.title} · {event?.callbackNumber}
+        </summary>
+        <p className="mt-2 pb-1 text-xs text-mute">
+          Opt-in roster. Region and timezone come from the household row, not the number. Key{" "}
+          {attempt.idempotencyKey}
+        </p>
+      </details>
+
+      <details open className="rounded-2xl bg-white px-5 py-2 shadow-card">
+        <summary className="cursor-pointer text-sm text-mute">Call reel</summary>
+        <div className="py-3">
+          <CallReelPlayer compact {...reelProps} />
+        </div>
+      </details>
+    </ConsoleShell>
   );
 }

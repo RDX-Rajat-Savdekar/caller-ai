@@ -18,6 +18,7 @@ const config: Config = {
         follow: "#ed6c02",
         safe: "#06c167",
         unaccounted: "#c4841d",
+        live: "#1a73e8",
       },
       boxShadow: {
         card: "0 1px 2px rgba(13,13,13,0.04), 0 8px 24px rgba(13,13,13,0.04)",

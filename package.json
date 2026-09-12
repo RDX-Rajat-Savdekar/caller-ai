@@ -13,6 +13,7 @@
     "dev:stack": "pnpm --filter @caller-ai/sim --filter @caller-ai/headcount --parallel dev",
     "db:seed": "pnpm --filter @caller-ai/headcount db:seed && pnpm --filter @caller-ai/vouch db:seed",
     "db:seed:headcount": "pnpm --filter @caller-ai/headcount db:seed",
+    "db:seed:after": "pnpm --filter @caller-ai/headcount db:seed:after",
     "db:seed:vouch": "pnpm --filter @caller-ai/vouch db:seed",
     "test": "pnpm --filter @caller-ai/core test",
     "typecheck": "pnpm -r --if-present typecheck",
