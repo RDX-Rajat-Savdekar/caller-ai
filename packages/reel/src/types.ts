@@ -19,6 +19,7 @@ export type CallReelProps = {
   transcript_turns: CallReelTurn[];
   structured_result?: Record<string, unknown>;
   linked: CallReelField[];
+  peerLabel?: string;
 };
 
 export type CoverageReelProps = {
@@ -33,7 +34,18 @@ export type TitleCardsProps = {
 };
 
 export type ScopeReelProps = {
+  candidate?: string;
+  jurisdiction?: string;
   requested: string[];
   permitted: string[];
-  blocked: string[];
+  blocked: Array<{ field: string; reason: string }>;
+  transcript_turns?: CallReelTurn[];
+  peerLabel?: string;
+};
+
+export type VerificationReelProps = {
+  dialed: number;
+  confirmed: number;
+  blocked: number;
+  names?: string[];
 };

@@ -2,6 +2,20 @@ import { describe, expect, it } from "vitest";
 import { linkEvidence } from "../src/evidence";
 
 describe("evidence linker", () => {
+  it("links a California VOE confirmation to the HR turn", () => {
+    const linked = linkEvidence({
+      structuredResult: {
+        employment_confirmed: "yes",
+        verifier_authority: "yes",
+      },
+      turns: [
+        { speaker: "user", text: "Yes, I am authorized to confirm employment." },
+        { speaker: "user", text: "Yes, Alex Rivera is employed here as Operations Coordinator." },
+      ],
+    });
+    expect(linked.every((field) => field.supported)).toBe(true);
+  });
+
   it("does not treat an honest unknown as an unsupported claim", () => {
     const linked = linkEvidence({
       structuredResult: { has_power: "unknown" },

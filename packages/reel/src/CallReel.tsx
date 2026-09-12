@@ -10,6 +10,15 @@ const LABELS: Record<string, string> = {
   medication: "Medication",
   household: "Household",
   needs_human: "Needs human",
+  employment_confirmed: "Employment",
+  title_stated: "Title",
+  start_date_stated: "Start date",
+  end_date_stated: "End date",
+  eligible_for_rehire: "Eligible for rehire",
+  verifier_name: "Verifier",
+  verifier_role: "Role",
+  verifier_authority: "Authority",
+  refusal_reason: "Refusal",
 };
 
 export const CALL_REEL_FPS = 30;
@@ -21,7 +30,7 @@ export function callReelFrames(turnCount: number): number {
   return Math.max(360, 80 + turnCount * 32 + 70);
 }
 
-export function CallReel({ household, disposition, transcript_turns, linked }: CallReelProps) {
+export function CallReel({ household, disposition, transcript_turns, linked, peerLabel = "Household" }: CallReelProps) {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
   const lastOffset = transcript_turns.at(-1)?.offset_seconds ?? 50;
@@ -103,7 +112,7 @@ export function CallReel({ household, disposition, transcript_turns, linked }: C
                       }}
                     >
                       <div style={{ fontSize: 11, color: colors.mute, fontVariantNumeric: "tabular-nums" }}>
-                        {turn.speaker === "user" ? "Household" : "Assistant"} · {clock(turn.offset_seconds)}
+                        {turn.speaker === "user" ? peerLabel : "Assistant"} · {clock(turn.offset_seconds)}
                       </div>
                       <div style={{ marginTop: 4, fontSize: 13, lineHeight: 1.45 }}>{turn.text}</div>
                     </div>

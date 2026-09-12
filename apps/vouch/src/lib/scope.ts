@@ -46,7 +46,9 @@ export function compileVouchTask(input: {
   employerCode: string;
   permitted: readonly string[];
 }): string {
-  const permittedList = input.permitted.map((field) => `- ${field}`).join("\n");
+  const permittedList = input.permitted
+    .map((field) => `- ${field.replaceAll("_", " ")}`)
+    .join("\n");
   return `You are calling ${input.employer} to verify employment for ${input.candidate}, who gave written
 authorization dated ${input.consentDate}. Identify yourself as an automated verification assistant
 acting for ${input.requestingOrg}.

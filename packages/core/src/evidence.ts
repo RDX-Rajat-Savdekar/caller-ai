@@ -59,6 +59,25 @@ const CLAIMS: Record<string, Record<string, string>> = {
     no: "okay",
     yes: "help",
   },
+  employment_confirmed: {
+    yes: "employed works here",
+    no: "not employed never worked",
+  },
+  eligible_for_rehire: {
+    yes: "eligible rehire",
+    no: "not eligible",
+    policy_no_comment: "policy comment",
+  },
+  verifier_authority: {
+    yes: "authorized confirm employment",
+    no: "third-party service can't transfer",
+  },
+  refusal_reason: {
+    third_party_only: "third-party service",
+    policy: "policy",
+    wrong_department: "wrong department",
+    needs_written_request: "written request",
+  },
 };
 
 function tokenize(value: string): string[] {
