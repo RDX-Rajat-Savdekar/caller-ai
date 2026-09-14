@@ -12,9 +12,12 @@ Safety note for maintainers: [`docs/safety.md`](docs/safety.md).
 | `headcount` | Disaster rapid needs assessment. **The denominator is the product.** | http://localhost:3000 |
 | `vouch` | Consent-scoped employment verification. **No consent artifact, no dial.** | http://localhost:3001 |
 
-Both consoles are operational in fixture mode. Sunday work is judge READMEs, video, and PRs
-into [`CALLE-AI/awesome-phone-call-agents`](https://github.com/CALLE-AI/awesome-phone-call-agents)
-— not a third product.
+Both consoles are operational in fixture mode. PRs are open:
+
+- Headcount: https://github.com/CALLE-AI/awesome-phone-call-agents/pull/601
+- Vouch: https://github.com/CALLE-AI/awesome-phone-call-agents/pull/605
+
+Remaining: public YouTube upload, Devpost form, feedback survey.
 
 ## Setup
 

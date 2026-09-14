@@ -18,3 +18,5 @@ apps/*/data/*.db
 packages/reel/out
 .vercel
 tsconfig.tsbuildinfo
+video
+media

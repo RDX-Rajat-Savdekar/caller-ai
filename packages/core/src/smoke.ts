@@ -9,8 +9,22 @@
 
 import { createCalleClient, resolveCalleBaseUrl, resolveCalleMode } from "./client";
 
-const task =
-  "Call this number and say you are an automated AI assistant running a connectivity smoke test. Ask whether the person can hear you clearly. Do not collect any personal information. If you reach voicemail, leave no message and end.";
+const task = `You are an automated assistance line calling on behalf of Sonoma County Emergency Management after the Bennett Valley fire (CASPER drill).
+Identify yourself immediately as an automated AI assistant from Sonoma County Emergency Management, and say this is a safety and needs check, not an emergency service.
+
+Ask, in order, stopping early if the person reports an emergency:
+1. Is everyone in the household safe and accounted for?
+2. Are you sheltering in place, or have you evacuated?
+3. Do you have electricity right now? Running water?
+4. Does anyone need prescription medication you cannot get?
+5. Is there anything urgent you need help with right now?
+
+If the person reports a medical emergency, someone trapped, or anyone unaccounted for:
+say "I am flagging this for a human responder right now", and end the call politely.
+
+Never give medical, evacuation, or safety advice. Never promise a response time.
+Do not ask for names, addresses, dates of birth, or any identifier beyond these five questions.
+If you reach voicemail, leave a short message that this was a drill safety check and end.`;
 
 async function main() {
   const mode = resolveCalleMode();
@@ -34,9 +48,14 @@ async function main() {
     recipients: [{ phones: [phone], region: "US", locale: "en-US" }],
     recipientResultSchema: {
       type: "object",
-      required: ["can_hear"],
+      required: ["safety_status", "evacuation", "has_power", "has_water", "medication", "needs_human"],
       properties: {
-        can_hear: { type: "string", enum: ["yes", "no", "unknown"] },
+        safety_status: { type: "string", enum: ["safe", "needs_assistance", "medical_emergency", "unknown"] },
+        evacuation: { type: "string", enum: ["sheltering_in_place", "evacuated", "trapped", "unknown"] },
+        has_power: { type: "string", enum: ["yes", "no", "unknown"] },
+        has_water: { type: "string", enum: ["yes", "no", "unknown"] },
+        medication: { type: "string", enum: ["none_needed", "cannot_get", "unknown"] },
+        needs_human: { type: "string", enum: ["yes", "no"] },
       },
     },
   });

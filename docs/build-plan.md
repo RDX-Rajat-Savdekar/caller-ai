@@ -500,14 +500,15 @@ Per platform doc §8. PRs go to `github.com/CALLE-AI/awesome-phone-call-agents`.
 - [x] Dry-run default; live calling opt-in via `CALLE_LIVE`
 - [x] Tests pass with no live credentials (`pnpm test`)
 - [x] Masked seed numbers; English only; no secrets in app code
-- [ ] `apps/typescript/headcount/` — PR 1 into `CALLE-AI/awesome-phone-call-agents`
-- [ ] `apps/typescript/vouch/` — PR 2
-- [ ] `skills/<extracted>/` — PR 3 only if both app PRs are already up
-- [ ] `python3 scripts/validate_repository.py` passes before opening each PR
-- [ ] Branch, commit, and PR titles follow `docs/git-naming-conventions.md`
-- [ ] ~3-minute video, public on YouTube, **shows at least one real call** (scored criterion)
+- [x] `apps/typescript/headcount/` — https://github.com/CALLE-AI/awesome-phone-call-agents/pull/601
+- [x] `apps/typescript/vouch/` — https://github.com/CALLE-AI/awesome-phone-call-agents/pull/605
+- [ ] `skills/<extracted>/` — skip unless review comments are already handled
+- [x] `python3 scripts/validate_repository.py` passes before opening each PR
+- [x] Branch, commit, and PR titles follow `docs/git-naming-conventions.md`
+- [x] ~4-minute submit cut on Desktop (`calle-submit.mp4`) — two live calls spliced
+- [ ] Public YouTube/Vimeo upload of that cut (Devpost requires a public URL)
 - [ ] Devpost form: PR URL + video URL + the email on the CALL-E account
-- [ ] `docs/safety.md` kept current (disclosure, opt-out, rate limiting, model-wrong path)
+- [x] `docs/safety.md` kept current (disclosure, opt-out, rate limiting, model-wrong path)
 - [ ] **Feedback survey** — unsigned webhooks, deprecated `verify`/`unwrap`, Cursor sandbox 403,
       undocumented Goals API
 

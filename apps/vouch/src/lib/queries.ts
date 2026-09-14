@@ -169,6 +169,8 @@ export type VouchSnapshot = {
     requested: string[];
     permitted: string[];
     blocked: Array<{ field: string; reason: string }>;
+    peerLabel: string;
+    transcript_turns: TranscriptTurn[];
   };
 };
 
